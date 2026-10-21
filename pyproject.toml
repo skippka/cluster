@@ -1,0 +1,22 @@
+[project]
+name = "cluster"
+version = "0.3.0"
+description = "A lightweight CLI cluster manager for a local network"
+requires-python = ">=3.10"
+dependencies = [
+    "cryptography>=42",
+    "psutil>=5.9",
+]
+
+[project.scripts]
+cluster = "cluster.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
