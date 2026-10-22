@@ -395,15 +395,25 @@ def swarm_dialog(app, command):
     elif command == "batch":
         print(" Analyze UTF-8 .txt/.md/.log files: word/line counts, SHA-256, duplicates.")
         print(" Selected file contents will be sent to your trusted workers over LAN.")
-        folder = input("Folder to analyze: ").strip().strip('"')
+        demo_dir = Path(__file__).resolve().parents[2] / "demo_corpus"
+        hint = f" [Enter for {demo_dir.name}]" if demo_dir.exists() else ""
+        folder = input(f"Folder to analyze{hint}: ").strip().strip('"')
+        if not folder and demo_dir.exists():
+            folder = str(demo_dir)
         batch, count, skipped = app.swarm.submit(folder)
         print(f" Batch {batch}: {count} files queued; {len(skipped)} skipped. Use batches/report.")
         for item in skipped[:10]:
             print(f"   Skipped {item['path']}: {item['reason']}")
     elif command == "report":
-        target, report = app.swarm.export(input("Batch ID: ").strip())
+        batch_id = input("Batch ID: ").strip()
+        target, report = app.swarm.export(batch_id)
         print(f" {report['files']}/{report['total_files']} files, {report['words']} words, {len(report['duplicates'])} duplicate groups")
-        print(f" Complete: {report['complete']}. Reports: {target} and {target.with_suffix('.csv')}")
+        print(f" Complete: {report['complete']}.")
+        print(f" Reports: {target}, {target.with_suffix('.csv')}, and {target.with_suffix('.html')}")
+        open_choice = input(" Open visual HTML dashboard in browser? [Y/n]: ").strip().lower()
+        if open_choice != 'n':
+            import webbrowser
+            webbrowser.open(str(target.with_suffix('.html').resolve()))
     elif command == "cancel-batch":
         print("Cancelled." if app.swarm.cancel(input("Batch ID: ").strip()) else "Unknown batch.")
     elif command == "sample":
@@ -542,7 +552,7 @@ def run_controller(port: int, cluster_key: str, data_dir: Path, secure=True):
                 print("  watch            живий моніторинг кластера (оновлення кожні 2 сек)")
                 print("  sample / batch   розподілити тестові або власні файли по воркерах")
                 print("  batches          прогрес обробки файлів та кількість спроб")
-                print("  report           експорт підсумкового звіту в JSON та CSV")
+                print("  report           експорт підсумкового звіту в JSON, CSV та HTML-дашборд")
                 print("  explain          перевірити готовність та рейтинг кожного воркера")
                 print("  demo             запустити тестове обчислення на кластері")
                 print("  run              запустити системну команду або Docker-контейнер")

@@ -193,4 +193,9 @@ class Swarm:
             writer.writerow(["path", "bytes", "lines", "words", "sha256"])
             for row in report["results"]:
                 writer.writerow([row["path"], row["bytes"], row["lines"], row["words"], row["sha256"]])
+        try:
+            from .report_html import generate_html_report
+            generate_html_report(report, target.with_suffix(".html"))
+        except Exception:
+            pass
         return target, report
