@@ -1,0 +1,3 @@
+﻿Cluster parallel sample file #4.
+Distributed computing splits work across LAN nodes.
+Testing parallel map execution.
